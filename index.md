@@ -6,11 +6,13 @@
 
 API to scrapes search result and product details from flipkart
 
+**Disclaimer:** I am not affiliated or linked to flipkart in any way. This repository is an exploratory project and not meant for commercial use.
+
 Check out [@flipkartX_bot](https://t.me/flipkartX_bot) on Telegram
 
 ![Flipkart API Banner](./banner.png)
 
-![Version](https://img.shields.io/badge/Version-3.1.0-green)
+![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdvishal485%2Fflipkart-scraper-api%2Fmain%2Fpackage.json&query=%24.version&label=version&color=green)
 [![GitHub license](https://img.shields.io/github/license/dvishal485/flipkart-scraper-api)](https://github.com/dvishal485/flipkart-scraper-api/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/dvishal485/flipkart-scraper-api)](https://github.com/dvishal485/flipkart-scraper-api/issues)
 [![Telegram](https://img.shields.io/badge/-dvishal485-blue?style=flat&logo=telegram)](https://t.me/dvishal485)
@@ -27,6 +29,9 @@ Check out [@flipkartX_bot](https://t.me/flipkartX_bot) on Telegram
     - [Product Details](#product-details)
   - [Increasing Resolution of Image](#increasing-resolution-of-image)
   - [Deployment](#deployment)
+    - [Deploy using Docker](#deploy-using-docker)
+    - [Deploy with Cloudflare Workers](#deploy-with-cloudflare-workers)
+    - [Deploy with NodeJS](#deploy-with-nodejs)
   - [Accuracy](#accuracy)
   - [Error Handling](#error-handling)
   - [ToDo](#todo)
@@ -72,7 +77,7 @@ Check out [@flipkartX_bot](https://t.me/flipkartX_bot) on Telegram
 ### Note
 
 - All the amounts are in currency INR
-- You can also explore products by [passing an empty search command](https://flipkart.dvishal485.workers.dev/search/)
+- You can also explore products by [passing an empty search command](https://flipkart-scraper-api.dvishal485.workers.dev/search/)
 
 ---
 
@@ -90,7 +95,7 @@ Check out [@flipkartX_bot](https://t.me/flipkartX_bot) on Telegram
 
   Example :
 
-- [View live demo](https://flipkart.dvishal485.workers.dev/search/laptop)
+- [View live demo](https://flipkart-scraper-api.dvishal485.workers.dev/search/laptop)
 - [View sample response](https://dvishal485.github.io/flipkart-scraper-api/sample-search.json)
 
 ### Product Link Argument
@@ -110,7 +115,7 @@ Link argument of a product will be URL of Flipkart product after removing the `h
   | `product_link_argument` | `string` | **Required**. Product link without `https://www.flipkart.com/` |
 
   Example :
-  - [View live demo](https://flipkart.dvishal485.workers.dev/product/apple-2020-macbook-air-m1-8-gb-256-gb-ssd-mac-os-big-sur-mgn63hn-a/p/itmde54f026889ce)
+  - [View live demo](https://flipkart-scraper-api.dvishal485.workers.dev/product/apple-2020-macbook-air-m1-8-gb-256-gb-ssd-mac-os-big-sur-mgn63hn-a/p/itmde54f026889ce)
   - [View sample response](https://dvishal485.github.io/flipkart-scraper-api/sample-product.json)
 
   The response will be given in following JSON format :
@@ -166,7 +171,7 @@ Link argument of a product will be URL of Flipkart product after removing the `h
   | `product_link_argument` | `string` | **Required**. Product link without `https://www.flipkart.com/` |
 
   Example :
-  - [View live demo](https://flipkart.dvishal485.workers.dev/product/compact/apple-2020-macbook-air-m1-8-gb-256-gb-ssd-mac-os-big-sur-mgn63hn-a/p/itmde54f026889ce)
+  - [View live demo](https://flipkart-scraper-api.dvishal485.workers.dev/product/compact/apple-2020-macbook-air-m1-8-gb-256-gb-ssd-mac-os-big-sur-mgn63hn-a/p/itmde54f026889ce)
 
   Returns same information but the sub-specifications are merged into one group, each seperated by `;`
 
@@ -183,7 +188,7 @@ Link argument of a product will be URL of Flipkart product after removing the `h
   | `product_link_argument` | `string` | **Required**. Product link without `https://www.flipkart.com/` |
 
   Example :
-  - [View live demo](https://flipkart.dvishal485.workers.dev/product/min/apple-2020-macbook-air-m1-8-gb-256-gb-ssd-mac-os-big-sur-mgn63hn-a/p/itmde54f026889ce)
+  - [View live demo](https://flipkart-scraper-api.dvishal485.workers.dev/product/min/apple-2020-macbook-air-m1-8-gb-256-gb-ssd-mac-os-big-sur-mgn63hn-a/p/itmde54f026889ce)
 
   Returns information without Specifications reducing the size of output largely.
 
@@ -199,9 +204,9 @@ Link argument of a product will be URL of Flipkart product after removing the `h
   | `product_link_argument` | `string` | **Required**. Product link without `https://www.flipkart.com/` |
 
   Example :
-  - [View live demo](https://flipkart.dvishal485.workers.dev/property/battery&display/s/kzZg7WuuuN)
+  - [View live demo](https://flipkart-scraper-api.dvishal485.workers.dev/property/battery&display/s/kzZg7WuuuN)
   
-  In the given example, we are get all the specs containg `battery` or `display` in the product with link argument [`s/kzZg7WuuuN`](https://flipkart.dvishal485.workers.dev/product/s/kzZg7WuuuN)
+  In the given example, we are get all the specs containg `battery` or `display` in the product with link argument [`s/kzZg7WuuuN`](https://flipkart-scraper-api.dvishal485.workers.dev/product/s/kzZg7WuuuN)
   
   Replies with product details and only those specifications which are mentioned to be searched.
 
@@ -227,9 +232,66 @@ https://rukminim2.flixcart.com/image/1024/1024/kzfvzww0/computer/r/g/i/hp-laptop
 
 ## Deployment
 
-Deploy your own API with Cloudflare Workers
+### Deploy using Docker
+
+- Fork and clone the repository on your system.
+
+    ```bash
+    git clone https://github.com/dvishal485/flipkart-scraper-api.git
+    cd flipkart-scraper-api
+    ```
+
+- Build docker image.
+
+    ```bash
+    docker build . --tag flipkart-scraper-api
+    ```
+
+- Start container from image.
+
+    ```bash
+    docker run -p3000:3000 localhost/flipkart-scraper-api
+    ```
+
+- API is now running actively on localhost with port 3000.
+- This by default uses express js to serve routes. If you want exact behaviour replicated, you can run docker container with command `test`.
+
+    ```bash
+    docker run -p3000:3000 localhost/flipkart-scraper-api test
+    ```
+
+### Deploy with Cloudflare Workers
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/dvishal485/flipkart-scraper-api)
+
+### Deploy with NodeJS
+
+- Make sure `node` and some package manager are installed on your system.
+- Fork and clone the repository on your system.
+
+  ```bash
+  git clone https://github.com/dvishal485/flipkart-scraper-api.git
+  cd flipkart-scraper-api
+  ```
+
+- Install required dependencies.
+
+  ```bash
+  npm install
+  ```
+
+- Run the server.
+
+  ```bash
+  npm run start
+  ```
+
+- You can optionally run using Cloudflare's official wrangler tool as well.
+
+  ```bash
+  npm install -g wrangler
+  WRANGLER_SEND_METRICS=false wrangler dev
+  ```
 
 ---
 
@@ -272,7 +334,7 @@ Deploy your own API with Cloudflare Workers
 - [x] Make code Presentable and Readable
 - [x] Extend API for product details
 - [x] Optimize existing code
-- [ ] [Support for newer deployment methods](https://github.com/dvishal485/flipkart-scraper-api/issues/5)
+- [x] [Support for newer deployment methods](https://github.com/dvishal485/flipkart-scraper-api/issues/5)
 - [x] Get product details (price & stock) specific to individual's pincode
 
   - Check out new repository [flipkart-product-stock](https://github.com/dvishal485/flipkart-product-stock)
@@ -287,4 +349,4 @@ Deploy your own API with Cloudflare Workers
 ## License and Copyright
 
 - This Project is [Apache-2.0](./LICENSE) Licensed
-- Copyright 2022 [Vishal Das](https://github.com/dvishal485)
+- Copyright 2023 [Vishal Das](https://github.com/dvishal485)

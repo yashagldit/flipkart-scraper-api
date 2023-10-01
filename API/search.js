@@ -1,4 +1,4 @@
-/* Copyright 2022 Vishal Das
+/* Copyright 2023 Vishal Das
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ const search = async (q, host) => {
         // Updates will be difficult and editing is not recommened in
         // this script until and unless you know what each line does.
         try {
-            let currentPrice = null, originalPrice = null, productLink = null, productName = null, isDiscounted = false, thumbnail = [];
+            let currentPrice = null, originalPrice = null, productLink = null, productName = null, isDiscounted = false, thumbnail = null;
             let linkDetails = null, lastLinkIndex = null, linkDetailsFinder = null
 
             // product price
 
-            let priceCheck = products[i].split('</div>')[0].replace(/,/g, '');
+            let priceCheck = products[i].split('</div>')[0].replace(/,|<|>|-|!/g, '');
             currentPrice = parseInt(priceCheck);
             originalPrice = parseInt(currentPrice);
 
@@ -36,6 +36,16 @@ const search = async (q, host) => {
                 //Method A - Compact screen with about mulltiple columns
                 try {
                     linkDetails = products[i - 1].split('</a>');
+                    try {
+                        let thumbnails_arr = products[i - 1].split('src="https');
+                        for (let i = 0; i < thumbnails_arr.length; i++) {
+                            let possible_thumbnail = thumbnails_arr[i].split('"')[0];
+                            if (possible_thumbnail.lastIndexOf("jpeg") != -1
+                                || possible_thumbnail.lastIndexOf("image") != -1) {
+                                thumbnail = "https" + possible_thumbnail; break;
+                            }
+                        }
+                    } catch (e) { }
                     lastLinkIndex = linkDetails.length - 2;
                     linkDetailsFinder = linkDetails[lastLinkIndex].split('target="_blank"');
                     if (linkDetailsFinder.length > 1) {
@@ -68,7 +78,25 @@ const search = async (q, host) => {
                         linkDetailsFinder = linkDetails[lastLinkIndex].split('target="_blank"');
                         if (linkDetailsFinder.length > 1) {
                             productLink = "https://www.flipkart.com" + linkDetailsFinder[1].split('href="')[1].split('"')[0];
-                            productName = linkDetailsFinder[1].split('href="')[1].split('"col col-7-12">')[1].split('</div>')[0].split('>')[1];
+                            try {
+                                if (linkDetailsFinder[1].indexOf("Sponsored") == -1) {
+                                    try {
+                                        productName = linkDetailsFinder[1].split('href="')[1].split('"col col-7-12">')[1].split('</div>')[0].split('>')[1];
+                                    } catch (e) {
+                                        try {
+                                            let occur = linkDetailsFinder[1].split('href="')[1].split('</div>')[0];
+                                            productName = occur.split('>')[occur.length - 1];
+                                        } catch (e) {
+                                            console.log("Couldn't fetch product name at all.");
+                                        }
+                                    }
+                                } else {
+                                    let span_class = linkDetailsFinder[1].split('"col col-7-12"')[1].split("</div>")[1].split(">")[2];
+                                    productName = span_class;
+                                }
+                            } catch (e) {
+                                console.log("Failed to obtain product name, keeping it null");
+                            }
                         }
                         if (reversion) {
                             i--;
@@ -87,7 +115,9 @@ const search = async (q, host) => {
                         // product thumbnail
 
                         try {
-                            thumbnail = webPageContents.split(`alt="${productName}"`)[1].split('src="')[1].split('"')[0];
+                            if (thumbnail == null) {
+                                thumbnail = webPageContents.split(`alt="${productName}"`)[1].split('src="')[1].split('"')[0];
+                            }
                         } catch (e) { thumbnail = null; }
                         if (i + 1 != products.length) {
                             var nextItem = products[i + 1].split('</div>')[0].replace(/,/g, '').split('<!-- -->');
@@ -110,11 +140,13 @@ const search = async (q, host) => {
                     // product thumbnail
 
                     try {
-                        thumbnail = webPageContents.split(`alt="${productName}"`);
-                        if (thumbnail.length == 1)
-                            thumbnail = webPageContents.split(`alt="${productName.slice(0, 5)}`);
-                        thumbnail = thumbnail[1].split('src="')[1].split('"')[0];
-                    } catch (e) { thumbnail = []; }
+                        if (thumbnail == null) {
+                            thumbnail = webPageContents.split(`alt="${productName}"`);
+                            if (thumbnail.length == 1)
+                                thumbnail = webPageContents.split(`alt="${productName.slice(0, 5)}`);
+                            thumbnail = thumbnail[1].split('src="')[1].split('"')[0];
+                        }
+                    } catch (e) { thumbnail = null; }
                     if (i + 1 != products.length) {
                         var nextItem = products[i + 1].split('</div>')[0].replace(/,/g, '').split('<!-- -->');
                         isDiscounted = nextItem.length > 1;
@@ -139,12 +171,12 @@ const search = async (q, host) => {
         }
     }
 
-    return JSON.stringify({
+    return {
         total_result: result.length,
         query: q,
         fetch_from: searchURL,
         result
-    }, null, 2);
+    };
 
 }
 
@@ -154,7 +186,6 @@ const clean = (link) => {
     url.searchParams.delete('_appId');
     url.searchParams.delete('_refId');
     url.searchParams.delete('cmpid');
-    url.searchParams.delete('pid');
     url.searchParams.delete('marketplace');
     url.searchParams.delete('ppt');
     url.searchParams.delete('lid');
